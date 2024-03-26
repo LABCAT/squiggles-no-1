@@ -79,7 +79,7 @@ const P5SketchWithAudio = () => {
         }
 
         p.draw = () => {
-            p.background(p.colourScheme[0].bg);
+            p.background(p.colourScheme.bg);
             p.hexagons.forEach((hexagon, index) => {
                 hexagon.rotation += (p.rotations[index] - hexagon.rotation) * 0.09;
                 p.push();
@@ -96,7 +96,7 @@ const P5SketchWithAudio = () => {
         }
 
         p.resetArcs = () => {
-            p.radius = p.random(p.width / 24, p.width / 128);
+            p.radius = p.random(p.width / 24, p.width / 96);
             p.altitude = (Math.sqrt(3) / 2) * p.radius;
             p.hexagons = []; 
             p.hexagonPattern = null;
@@ -113,7 +113,7 @@ const P5SketchWithAudio = () => {
             let hexagonLines = p.createGraphics(p.radius * 2, p.radius * 2);
             hexagonLines.noFill();
             hexagonLines.strokeWeight(p.radius / 2);
-            hexagonLines.stroke(p.colourScheme[0].innerStroke);
+            hexagonLines.stroke(p.colourScheme.innerStroke);
             hexagonLines.ellipse(p.radius - p.altitude, p.radius - p.radius / 2, p.radius, p.radius);
             hexagonLines.ellipse(p.radius + p.altitude * 2, p.radius, p.radius * 3, p.radius * 3);
             hexagonLines.ellipse(
@@ -123,7 +123,7 @@ const P5SketchWithAudio = () => {
                 p.radius * 3
             );
             hexagonLines.strokeWeight(p.radius / 4);
-            hexagonLines.stroke(p.colourScheme[0].outerStroke);
+            hexagonLines.stroke(p.colourScheme.outerStroke);
             hexagonLines.ellipse(p.radius - p.altitude, p.radius - p.radius / 2, p.radius, p.radius);
             hexagonLines.ellipse(p.radius + p.altitude * 2, p.radius, p.radius * 3, p.radius * 3);
             hexagonLines.ellipse(
@@ -154,29 +154,30 @@ const P5SketchWithAudio = () => {
 
         p.generateColourScheme = () => {
             const randomColor = require('randomcolor');
-            for (let i = 0; i < 6; i++) {
-                const colours = randomColor({
-                    luminosity: 'light',
-                    format: 'rgb',
-                    count: 3
-                });
-                p.colourScheme[i] = {
-                    innerStroke: colours[0],
-                    outerStroke: colours[1],
-                    bg: Math.random() < 0.03 ? colours[2] : '#ffffff',
-                    // bg: '#ffffff',
-                }
+            const colours = randomColor({
+                luminosity: Math.random() < 0.2 ? 'bright' : 'light',
+                format: 'rgb',
+                count: 3
+            });
+            p.colourScheme = {
+                innerStroke: colours[0],
+                outerStroke: colours[1],
+                bg: Math.random() < 0.2 ? colours[2] : '#ffffff',
             }
         }
 
         p.executeCueSet1 = ({currentCue}) => {
-            console.log(currentCue);
-            if ((currentCue % 42 >= 29 && currentCue % 42 <= 42) || currentCue > 210) {
+            if(currentCue % 42 === 1) {
+                p.generateColourScheme();
+                
+            }
+            if ((currentCue % 42 >= 29 && currentCue % 42 <= 42) || currentCue % 42 === 0 || currentCue > 210) {
                 p.generateColourScheme();
                 p.resetArcs();
             }
             else {
-                for (let i = 0; i < 1; i++) {
+                const maxLoops = p.radius <= p.width / 48 ? 6 : 2;
+                for (let i = 0; i < maxLoops; i++) {
                     const x = p.random(0, p.width);
                     const y = p.random(0, p.height);
                 
